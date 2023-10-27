@@ -1,0 +1,156 @@
+# link para compilar: https://www.online-python.com/
+
+class Empleado:
+    def __init__(self, nombre, apellidos, cedula, direccion, telefono, profesion, departamento, puesto, salario_base, prestamo, horas_extras):
+        self.nombre = nombre
+        self.apellidos = apellidos
+        self.cedula = cedula
+        self.direccion = direccion
+        self.telefono = telefono
+        self.profesion = profesion
+        self.departamento = departamento
+        self.puesto = puesto
+        self.salario_base = salario_base
+        self.prestamo = prestamo
+        self.horas_extras = horas_extras
+
+    def calcular_descuentos(self):
+        # Calcula los descuentos
+        descuento_afp = self.salario_base * 0.0287
+        descuento_sgm = self.salario_base * 0.0304
+        descuento_prestamo = self.prestamo / 12
+        total_descuentos = descuento_afp + descuento_sgm + descuento_prestamo
+        return total_descuentos
+
+    def calcular_neto(self):
+        # Calcula el salario neto
+        if self.horas_extras <= 3:
+            pago_horas_extras = self.horas_extras * self.salario_base / 176 * 1.35
+        else:
+            pago_horas_extras = (3 * self.salario_base / 176 * 1.35) + ((self.horas_extras - 3) * self.salario_base / 176 * 2)
+
+        salario_bruto = self.salario_base + pago_horas_extras
+        salario_neto = salario_bruto - self.calcular_descuentos() - self.calcular_isr()
+        return salario_neto
+
+    def calcular_isr(self):
+        # Calcula el impuesto sobre la renta
+        salario_anual = self.salario_base * 12
+        if salario_anual <= 416220:
+            isr = 0
+        elif salario_anual <= 624329:
+            isr = (salario_anual - 416220) * 0.15 + 31216
+        elif salario_anual <= 867123:
+            isr = (salario_anual - 624329) * 0.20 + 62432
+        else:
+            isr = (salario_anual - 867123) * 0.25 + 106982
+
+        isr_mensual = isr / 12
+        return isr_mensual
+
+class Empresa:
+    def __init__(self):
+        self.empleados = []
+
+    def registrar_empleado(self, empleado):
+        # Registra un nuevo empleado
+        self.empleados.append(empleado)
+
+    def buscar_empleado(self, cedula):
+        # Busca un empleado por cédula
+        for empleado in self.empleados:
+            if empleado.cedula == cedula:
+                return empleado
+        return None
+
+    def borrar_empleado(self, cedula):
+        # Elimina un empleado por cédula
+        empleado = self.buscar_empleado(cedula)
+        if empleado:
+            self.empleados.remove(empleado)
+
+    def generar_nomina(self):
+        # Genera la nómina de la empresa
+        nomina = {}
+        for empleado in self.empleados:
+            nomina[empleado.cedula] = empleado.calcular_neto()
+        return nomina
+
+
+if __name__ == "__main__":
+    empresa = Empresa()
+
+    while True:
+        print("Opciones:")
+        print("1. Registrar empleado")
+        print("2. Editar empleado")
+        print("3. Borrar empleado")
+        print("4. Calcular y mostrar resultados")
+        print("5. Salir")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            nombre = input("Nombre: ")
+            apellidos = input("Apellidos: ")
+            cedula = input("Cédula: ")
+            direccion = input("Dirección: ")
+            telefono = input("Teléfono: ")
+            profesion = input("Profesión: ")
+            departamento = input("Departamento: ")
+            puesto = input("Puesto: ")
+            salario_base = float(input("Salario base: "))
+            prestamo = float(input("Monto del préstamo: "))
+            horas_extras = int(input("Horas extras: "))
+
+            empleado = Empleado(nombre, apellidos, cedula, direccion, telefono, profesion, departamento, puesto,
+                                salario_base, prestamo, horas_extras)
+            empresa.registrar_empleado(empleado)
+            print("Empleado registrado con éxito.")
+
+
+        elif opcion == "2":
+
+            cedula = input("Ingrese la cédula del empleado a editar: ")
+
+            nombre = input("Nuevo nombre: ")
+
+            apellidos = input("Nuevos apellidos: ")
+
+            direccion = input("Nueva dirección: ")
+
+            telefono = input("Nuevo teléfono: ")
+
+            profesion = input("Nueva profesión: ")
+
+            departamento = input("Nuevo departamento: ")
+
+            puesto = input("Nuevo puesto: ")
+
+            salario_base = float(input("Nuevo salario base: "))
+
+            prestamo = float(input("Nuevo monto del préstamo: "))
+
+            horas_extras = int(input("Nuevas horas extras: "))
+
+            empresa.editar_empleado(cedula, nombre, apellidos, direccion, telefono, profesion, departamento, puesto,
+                                    salario_base, prestamo, horas_extras)
+            print("Empleado editado con éxito.")
+
+        elif opcion == "3":
+            cedula = input("Ingrese la cédula del empleado a borrar: ")
+            empresa.borrar_empleado(cedula)
+
+        elif opcion == "4":
+            cedula = input("Ingrese la cédula del empleado: ")
+            empleado = empresa.buscar_empleado(cedula)
+            if empleado:
+                print(f"Resultados para el empleado {empleado.nombre} {empleado.apellidos}:")
+                print(f"Descuentos: {empleado.calcular_descuentos()}")
+                print(f"Salario Neto: {empleado.calcular_neto()}")
+            else:
+                print("Empleado no encontrado.")
+
+        elif opcion == "5":
+            break
+
